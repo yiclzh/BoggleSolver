@@ -43,13 +43,26 @@ public class BoggleSolver {
     private void createGraph(int[][] board) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-
+                // left
+                // right
+                // top
+                // bottom
+                // diagonal-up-left
+                // diagonal-down-left
+                // diagonal-up-right
+                // diagonal-down-right
             }
         }
     }
 
+    private boolean isValid(int i, int j) {
+        if (i > rows || i < 0 || j > cols || j < 0) { return false; }
+        return true;
+    }
+
     class Node {
         char letter;
+        boolean visited;
         Node left;
         Node right;
         Node top;

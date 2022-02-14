@@ -34,7 +34,7 @@ public class BoggleSolver {
     private SET<String> dfs(BoggleBoard board, int i , int j) {
         Node s = new Node(i, j);
         boolean[][] marked = new boolean[rows][cols];
-        return dfs(board, s, "", marked);
+        return dfs(board, s, "" + board.getLetter(i,j), marked);
     }
 
     private SET<String> dfs(BoggleBoard b, Node t, String prefix, boolean[][] marked) {
@@ -125,7 +125,7 @@ public class BoggleSolver {
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
     // (Assume each word contains only the uppercase letters A through Z
     public int scoreOf(String word) {
-        if (!trieSET.contains(word) && word.length() < 3) {
+        if (!trieSET.contains(word) || word.length() < 3) {
             return 0;
         }
         if (word.length() == 3 || word.length() == 4) {

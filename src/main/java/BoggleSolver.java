@@ -1,15 +1,11 @@
 import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.TrieSET;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 public class BoggleSolver {
     private TrieSET trieSET;
     private int rows;
     private int cols;
-    private BoggleBoard board;
-    private Map<Character, Integer> boardValues = new HashMap<>();
 
     // Initializes the data structure using the given array of strings as the dictionary.
     // (Assume each word in the dictionary contains only the uppercase letters A through Z)
@@ -22,19 +18,17 @@ public class BoggleSolver {
 
     // Returns the set of all valid words in the given Boggle board, as in Iterable
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        SET<String> validWords = new SET<>();
-        this.board = board;
         rows = board.rows();
         cols = board.cols();
+        SET<String> validWords = new SET<String>();
 
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        for (int i = 0; i < board.rows(); ++i) {
+            for (int j = 0; j < board.cols(); ++j) {
                 validWords = validWords.union(dfs(board, i, j));
             }
         }
 
         return validWords;
-
     }
 
     private SET<String> dfs(BoggleBoard board, int i , int j) {
@@ -131,7 +125,7 @@ public class BoggleSolver {
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
     // (Assume each word contains only the uppercase letters A through Z
     public int scoreOf(String word) {
-        if (!trieSET.contains(word)) {
+        if (!trieSET.contains(word) && word.length() < 3) {
             return 0;
         }
         if (word.length() == 3 || word.length() == 4) {

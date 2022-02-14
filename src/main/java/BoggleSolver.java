@@ -91,21 +91,27 @@ public class BoggleSolver {
         if (i > 0) {
             adj.push(new Node(i-1, j)); // top
             if (j > 0) {
-                adj.push(new Node(i-1, j-1)); // diagonal-up-right
+                adj.push(new Node(i-1, j-1)); // diagonal-up-left
             }
             if (j < cols - 1) {
-                adj.push(new Node(i-1, j+1)); // diagonal-up-left
+                adj.push(new Node(i-1, j+1)); // diagonal-up-right
             }
         }
         if (i < rows -1) {
             adj.push(new Node(i+1, j)); // bottom
             if (j > 0) {
-                adj.push(new Node(i+1, j-1));
+                adj.push(new Node(i+1, j-1)); // diagonal-bottom-left
             }
             if (j < cols - 1) {
-                adj.push(new Node(i+1, j+1));
+                adj.push(new Node(i+1, j+1)); // diagonal-bottom-right
             }
 
+        }
+        if (j > 0) {
+            adj.push(new Node(i, j-1)); // left
+        }
+        if (j < cols - 1) {
+            adj.push(new Node(i, j+1)); // right
         }
         return adj;
     }

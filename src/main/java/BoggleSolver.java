@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.TrieSET;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -71,7 +70,7 @@ public class BoggleSolver {
 
     }
 
-    public boolean hasKeysWithPrefix(String word) {
+    private boolean hasKeysWithPrefix(String word) {
         StringBuilder stringBuilder = new StringBuilder();
         for (String s : trieSET.keysWithPrefix(word)) {
             stringBuilder.append(s);

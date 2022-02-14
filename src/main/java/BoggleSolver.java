@@ -1,7 +1,9 @@
+import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.TrieSET;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 public class BoggleSolver {
     private TrieSET trieSET;
@@ -21,64 +23,101 @@ public class BoggleSolver {
 
     // Returns the set of all valid words in the given Boggle board, as in Iterable
     public Iterable<String> getAllValidWords(BoggleBoard board) {
-        ArrayList<String> validWords = new ArrayList<>();
+        SET<String> validWords = new SET<>();
         this.board = board;
         rows = board.rows();
         cols = board.cols();
-        char[][] arrayBoard = createBoard(board);
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                validWords = validWords.union(dfs(board, i, j));
+            }
+        }
+
         return validWords;
+
     }
 
-    private char[][] createBoard(BoggleBoard board) {
-        char[][] arrayBoard = new char[rows][cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                arrayBoard[i][j] = board.getLetter(i, j);
+    private SET<String> dfs(BoggleBoard board, int i , int j) {
+        Node s = new Node(i, j);
+        boolean[][] marked = new boolean[rows][cols];
+        return dfs(board, s, "", marked);
+    }
+
+    private SET<String> dfs(BoggleBoard b, Node t, String prefix, boolean[][] marked) {
+        marked[t.i][t.j] = true;
+        SET<String> words = new SET<>();
+
+        if (prefix.charAt(prefix.length()-1) == 'Q') {
+            prefix += 'U';
+        }
+
+        if (trieSET.contains(prefix) && prefix.length() > 2) {
+            words.add(prefix);
+        }
+
+        for (Node w : adj(b, t)) {
+            if(!marked[w.i][w.j]) {
+                char letter = b.getLetter(w.i, w.j);
+                String word = prefix + letter;
+                if (hasKeysWithPrefix(word)) {
+                    words = words.union(dfs(b, w, word, marked));
+                }
             }
         }
-        return arrayBoard;
+
+        marked[t.i][t.j] = false;
+        return words;
+
     }
 
-
-    private void createGraph(int[][] board) {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                // left
-                // right
-                // top
-                // bottom
-                // diagonal-up-left
-                // diagonal-down-left
-                // diagonal-up-right
-                // diagonal-down-right
-            }
+    public boolean hasKeysWithPrefix(String word) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String s : trieSET.keysWithPrefix(word)) {
+            stringBuilder.append(s);
         }
-    }
-
-    private boolean isValid(int i, int j) {
-        if (i > rows || i < 0 || j > cols || j < 0) { return false; }
+        if (stringBuilder.length() == 0) {
+            return false;
+        }
         return true;
     }
 
-    class Node {
-        char letter;
-        boolean visited;
-        Node left;
-        Node right;
-        Node top;
-        Node bottom;
-        Node diagonalUpLeft;
-        Node diagonalDownLeft;
-        Node diagonalUpRight;
-        Node diagonalDownRight;
+
+    private Iterable<Node> adj(BoggleBoard board, Node t) {
+        return adj(board, t.i, t.j);
+    }
+
+    private Iterable<Node> adj(BoggleBoard board, int i , int j) {
+        Stack<Node> adj = new Stack<>();
+        if (i > 0) {
+            adj.push(new Node(i-1, j)); // top
+            if (j > 0) {
+                adj.push(new Node(i-1, j-1)); // diagonal-up-right
+            }
+            if (j < cols - 1) {
+                adj.push(new Node(i-1, j+1)); // diagonal-up-left
+            }
+        }
+        if (i < rows -1) {
+            adj.push(new Node(i+1, j)); // bottom
+            if (j > 0) {
+                adj.push(new Node(i+1, j-1));
+            }
+            if (j < cols - 1) {
+                adj.push(new Node(i+1, j+1));
+            }
+
+        }
+        return adj;
     }
 
 
-    private boolean contains(String word) {
-        if (trieSET.contains(word)) {
-            return true;
-        } else {
-            return false;
+    private class Node {
+        public int i, j;
+
+        public Node (int i, int j) {
+            this.i = i;
+            this.j = j;
         }
     }
 
@@ -87,58 +126,19 @@ public class BoggleSolver {
     // Returns the score of the given word if it is in the dictionary, zero otherwise.
     // (Assume each word contains only the uppercase letters A through Z
     public int scoreOf(String word) {
-        if (contains(word)) {
-            if (word.length() == 3 || word.length() == 4) {
-                return 1;
-            }
-            else if (word.length() == 5) {
-                return 2;
-            }
-            else if (word.length() == 6) {
-                return 3;
-            }
-            else if (word.length() == 7) {
-                return 5;
-            }
-            else if (word.length() >= 8) {
-                return 11;
-            }
+        if (!trieSET.contains(word)) {
+            return 0;
         }
-        return 0;
-    }
-
-
-    public static void main(String[] args) {
-        String[] dictionary = new String[6];
-        dictionary[0] = "Facebook";
-        dictionary[1] = "Apple";
-        dictionary[2] = "Amazon";
-        dictionary[3] = "Google";
-        dictionary[4] = "Netflix";
-        dictionary[5] = "SpaceX";
-        BoggleSolver boggleSolver = new BoggleSolver(dictionary);
-        for (String s : boggleSolver.trieSET.keysWithPrefix("A")) {
-            System.out.println(s);
+        if (word.length() == 3 || word.length() == 4) {
+            return 1;
+        } else if (word.length() == 5) {
+            return 2;
+        } else if (word.length() == 6) {
+            return 3;
+        } else if (word.length() == 7) {
+            return 5;
         }
-        char[][] boggleBoard = new char[4][4];
-        boggleBoard[0][0] = 'A';
-        boggleBoard[0][1] = 'T';
-        boggleBoard[0][2] = 'E';
-        boggleBoard[0][3] = 'E';
-        boggleBoard[1][0] = 'A';
-        boggleBoard[1][1] = 'P';
-        boggleBoard[1][2] = 'Y';
-        boggleBoard[1][3] = 'O';
-        boggleBoard[2][0] = 'T';
-        boggleBoard[2][1] = 'I';
-        boggleBoard[2][2] = 'N';
-        boggleBoard[2][3] = 'U';
-        boggleBoard[3][0] = 'E';
-        boggleBoard[3][1] = 'D';
-        boggleBoard[3][2] = 'S';
-        boggleBoard[3][3] = 'E';
-        BoggleBoard board = new BoggleBoard(boggleBoard);
-        boggleSolver.getAllValidWords(board);
+        return 11;
     }
 
 
